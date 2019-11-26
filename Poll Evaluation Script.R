@@ -48,14 +48,22 @@ summary_m20_q8 %>% ggplot(aes(x=reorder(Whatdoyouthinktheeconomicgrowthforyourco
   labs(x="",y="",title = "What do you think the economic growth for your country will look like in 2020?
 ") +   ggthemes::theme_economist()
 
-# Industry Specific Slowing Growth
+# Industry Specific Slowing Growth, SEA level aggregation
 
-m20 %>% group_by(Whatindustryareyouoperatingin,Whichcountryareyouoperatingin) %>% 
+m20 %>% group_by(Whatindustryareyouoperatingin) %>% 
   summarise(Count=n()) %>% mutate(Per_centage=Count/sum(Count)*100) %>% 
   filter(Count>2) %>% ggplot(aes(x=reorder(Whatindustryareyouoperatingin,Per_centage),y=Per_centage,fill=Per_centage)) + 
-  geom_bar(stat="identity") + coord_flip() + facet_wrap(~Whichcountryareyouoperatingin) + 
+  geom_bar(stat="identity") + coord_flip(y=c(0,20))  + geom_text(aes(label= round(Per_centage,2)), hjust=-0.1, size=3) +
   scale_fill_distiller(palette = "Spectral") + 
-  labs(y="Per Centage of Responders Reporting Slowing Growth",x="") + 
+  labs(y="Per Centage of Responders Reporting Slowing Growth",x="",title = "Financial Services, Telco and FMCG are experiencing slowest customer growth in SEA") + 
   ggthemes::theme_economist()
-
+ 
+# Industry Specific Slowing Growth, country level breakdown
+m20 %>% group_by(Whatindustryareyouoperatingin,Whichcountryareyouoperatingin) %>% 
+  summarise(Count=n()) %>% mutate(Per_centage=Count/sum(Count)*100) %>%
+  filter(Count>2) %>% ggplot(aes(x=reorder(Whatindustryareyouoperatingin,Per_centage),y=Per_centage,fill=Per_centage)) + 
+  geom_bar(stat="identity") + coord_flip(y=c(0,50))  + geom_text(aes(label= round(Per_centage,2)), hjust=-0.1, size=3) +
+  scale_fill_distiller(palette = "Spectral") + 
+  labs(y="Per Centage of Responders Reporting Slowing Growth",x="",title = "Financial Services, Telco and FMCG are experiencing slowest customer growth in SEA") + 
+  facet_wrap(~Whichcountryareyouoperatingin) +  ggthemes::theme_economist()
 
