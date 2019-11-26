@@ -47,6 +47,4 @@ ADA_Campaigns_kwd %>%
   group_by(Campaign,Keyword) %>% 
   summarise(sTotal_Time=sum(Avg.sessionduration_seconds_)/60,Total_Pages=sum(Pages_session),Total_sessions=sum(Avg.sessionduration_seconds_>0)) %>% filter(sTotal_Time>0) %>% 
   ggplot(aes(x=reorder(Keyword,sTotal_Time),y=sTotal_Time,fill=Total_Pages)) + geom_bar(stat="identity") + coord_flip() + scale_fill_distiller(palette = "Spectral","Total Pages Per Session") + 
-  labs(x="Total Time in Minutes",y="Keywords") + facet_wrap(~Campaign) + ggthemes::theme_economist()
-    
-  )
+  labs(x="Total Time in Minutes",y="Keywords") + facet_wrap(~Campaign) + ggthemes::theme_economist())
