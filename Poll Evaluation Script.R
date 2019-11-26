@@ -50,4 +50,12 @@ summary_m20_q8 %>% ggplot(aes(x=reorder(Whatdoyouthinktheeconomicgrowthforyourco
 
 # Industry Specific Slowing Growth
 
+m20 %>% group_by(Whatindustryareyouoperatingin,Whichcountryareyouoperatingin) %>% 
+  summarise(Count=n()) %>% mutate(Per_centage=Count/sum(Count)*100) %>% 
+  filter(Count>2) %>% ggplot(aes(x=reorder(Whatindustryareyouoperatingin,Per_centage),y=Per_centage,fill=Per_centage)) + 
+  geom_bar(stat="identity") + coord_flip() + facet_wrap(~Whichcountryareyouoperatingin) + 
+  scale_fill_distiller(palette = "Spectral") + 
+  labs(y="Per Centage of Responders Reporting Slowing Growth",x="") + 
+  ggthemes::theme_economist()
+
 
