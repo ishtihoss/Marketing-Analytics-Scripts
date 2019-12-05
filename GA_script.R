@@ -64,8 +64,12 @@ cpm <- page_metrics %>%
 
 # Page metrics country specific dash
 
-cpm %>% filter(total_upv>100) %>% ggplot(aes(total_upv,avg_time_per_entrance)) + 
+cpm %>% filter(total_upv>100 & avg_time_per_entrance>1) %>% ggplot(aes(total_upv,avg_time_per_entrance)) + 
   geom_point() + scale_x_continuous(trans="log10") + 
   ggrepel::geom_text_repel(aes(label=landingPagePath)) + facet_wrap(~country)
 
+# Dash 2
 
+cpm %>% filter(total_upv>100 & top_mins>2*mean(top_mins)) %>% ggplot(aes(total_upv,top_mins)) + 
+  +   geom_point() + scale_x_continuous(trans="log10") + scale_y_continuous(trans="log2") +
+  +   ggrepel::geom_text_repel(aes(label=str_trunc(landingPagePath,20,"right"))) + facet_wrap(~country)
