@@ -22,6 +22,6 @@ google_analytics(ga_id,
 
 ga_data <- google_analytics(ga_id, 
                             date_range = c("2019-01-01", "2019-12-05"),
-                            metrics = c("users","newUsers","percentNewSessions","sessionsPerUser"),
-                            dimensions = c("userType","sessionCount","daysSinceLastSession","userDefinedValue","userBucket"),
+                            metrics = c("users","newUsers","percentNewSessions","sessionsPerUser","sessions","bounces","bounceRate","sessionDuration","avgSessionDuration"),
+                            dimensions = c("userType","sessionCount","daysSinceLastSession","userDefinedValue","userBucket","sessionDurationBucket","referralPath","fullReferrer","campaign","source","medium","keyword","adContent","socialNetwork","hasSocialSourceReferral"),
                             anti_sample = TRUE)
