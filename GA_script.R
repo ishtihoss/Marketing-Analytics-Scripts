@@ -48,7 +48,7 @@ ga_data %>% group_by(fullReferrer) %>% summarise(tpv=sum(uniquePageviews)) %>%
 page_metrics <- google_analytics(ga_id, 
                             date_range = c("2019-01-01", "2019-12-05"),
                             metrics = c("entrances","entranceRate","pageviews","pageviewsPerSession", 
-                                        "uniquePageviews", "timeOnPage", "avgTimeOnPage", "exits", "exitRate"),
+                                        "uniquePageviews", "timeOnPage", "avgTimeOnPage","sessions","sessionDuration"),
                             dimensions = c("pagePath","country","landingPagePath","secondPagePath","exitPagePath",
                                            "previousPagePath","pageDepth"),
                             anti_sample = TRUE)
@@ -62,14 +62,47 @@ cpm <- page_metrics %>%
   mutate(avg_time_per_entrance=top_mins/total_entrances)
 
 
-# Page metrics country specific dash
+# Page metrics country level facet
 
-cpm %>% filter(total_upv>100 & avg_time_per_entrance>1) %>% ggplot(aes(total_upv,avg_time_per_entrance)) + 
-  geom_point() + scale_x_continuous(trans="log10") + 
-  ggrepel::geom_text_repel(aes(label=landingPagePath)) + facet_wrap(~country)
+cpm %>% filter(total_entrances>100 & avg_time_per_entrance>.16) %>% ggplot(aes(total_entrances,avg_time_per_entrance)) + 
+  geom_point() + scale_x_continuous(trans="log10") + scale_y_continuous(trans="log2")+
+  ggrepel::geom_text_repel(aes(label=str_trunc(landingPagePath,30))) + facet_wrap(~country) + labs(x="Total Entrances",y="Average time per entrance in minutes",title="2020 Outlook Report is doing well across Bangladesh, Indonesia and Malaysia",caption = "ADA website vistor data from 1st Jan 2019 to 5th December 2019")
+
+# Defining a function
+
+countries <- c("Malaysia","Indonesia","Bangladesh","Singapore","Sri Lanka","Philippines","Cambodia","South Korea","Thailand")
+
+country_viz <- function(countries){  
+viz <-  cpm %>% filter(total_entrances>100 & country==countries & avg_time_per_entrance>.1) %>% 
+  ggplot(aes(total_entrances,avg_time_per_entrance)) + 
+  geom_point() + scale_x_continuous(trans="log10") + scale_y_continuous(trans="log2")+
+  ggrepel::geom_text_repel(aes(label=str_trunc(landingPagePath,30))) + scale_fill_distiller(palette = "Spectral") +
+  labs(x="Total Entrances",y="Average Time per Entrance in Minutes")
+return(viz)
+}
+
 
 # Dash 2
 
-cpm %>% filter(total_upv>100 & top_mins>2*mean(top_mins)) %>% ggplot(aes(total_upv,top_mins)) + 
-  +   geom_point() + scale_x_continuous(trans="log10") + scale_y_continuous(trans="log2") +
-  +   ggrepel::geom_text_repel(aes(label=str_trunc(landingPagePath,20,"right"))) + facet_wrap(~country)
+cpm %>% filter(total_upv>100) %>% ggplot(aes(total_upv,avg_time_per_entrance)) + 
+  geom_point() + scale_x_continuous(trans="log10") + scale_y_continuous(trans="log2") +
+  ggrepel::geom_text_repel(aes(label=str_trunc(landingPagePath,20,"right"))) + facet_wrap(~country)
+
+
+# Best Landing pages by average session duration
+
+page_metrics %>% filter(country=="Malaysia") %>% 
+  group_by(landingPagePath) %>% summarise(asd=sum(sessionDuration)/sum(sessions),ts=sum(sessions)) %>% 
+  filter(ts>100) %>% ggplot(aes(asd,ts,label=str_trunc(landingPagePath,30))) + 
+  geom_point() + scale_y_continuous(trans="log10") + 
+  ggrepel::geom_text_repel()+labs(x="Average Session Duration in Seconds",y="Total Number of Sessions")
+
+# Creating a function for previous 
+
+lp_trap <- function(countries){
+page_metrics %>% filter(country==countries) %>% 
+  group_by(landingPagePath) %>% summarise(asd=sum(sessionDuration)/sum(sessions),ts=sum(sessions)) %>% 
+  filter(ts>100) %>% ggplot(aes(asd,ts,label=str_trunc(landingPagePath,30))) + 
+  geom_point() + scale_y_continuous(trans="log10") + 
+  ggrepel::geom_text_repel()+labs(x="Average Session Duration in Seconds",y="Total Number of Sessions")
+}
