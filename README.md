@@ -1,2 +1,2 @@
-# ADAScripts
-ADA Google Ads API Script
+# MAScripts
+Google Ads API Script
